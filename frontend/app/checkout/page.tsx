@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useCarrinho } from '@/hooks/useCarrinho';
 import { api } from '@/lib/api';
 import { supabase } from '@/lib/supabase';
+import { Pedido } from '@/types';
 import ProtectedRoute from '@/components/ProtectedRoute';
 
 function CheckoutContent() {
@@ -49,7 +50,7 @@ function CheckoutContent() {
         endereco
       };
 
-      const pedido = await api.post('/api/pedidos', pedidoData);
+      const pedido = await api.post<Pedido>('/api/pedidos', pedidoData);
 
       // Processar pagamento
       await api.post('/api/pagamentos/processar', {
