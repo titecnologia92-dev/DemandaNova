@@ -9,22 +9,39 @@ dotenv.config();
 const app = express();
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
 
+// Tratamento explícito de OPTIONS (preflight) antes do CORS middleware
+// Isso garante que requisições preflight sejam tratadas corretamente
+app.options('*', (req: Request, res: Response) => {
+  const origin = req.headers.origin;
+  
+  if (origin) {
+    const isLocalhost = origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:');
+    const isVercel = origin.includes('.vercel.app');
+    const isFrontendUrl = FRONTEND_URL && origin.startsWith(FRONTEND_URL);
+    
+    if (isLocalhost || isVercel || isFrontendUrl || process.env.NODE_ENV === 'development') {
+      res.header('Access-Control-Allow-Origin', origin);
+      res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+      res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+      res.header('Access-Control-Allow-Credentials', 'true');
+      res.header('Access-Control-Max-Age', '86400');
+      return res.status(200).end();
+    }
+  }
+  
+  res.status(204).end();
+});
+
 // Middleware CORS - Configuração mais permissiva para Vercel
 app.use(cors({
   origin: (origin, callback) => {
     // Permitir requisições sem origin (ex: Postman, mobile apps)
     if (!origin) {
-      console.log('CORS: Request without origin, allowing');
       return callback(null, true);
     }
     
-    console.log(`CORS: Checking origin: ${origin}`);
-    console.log(`CORS: FRONTEND_URL: ${FRONTEND_URL}`);
-    console.log(`CORS: NODE_ENV: ${process.env.NODE_ENV}`);
-    
     // Em desenvolvimento, permitir qualquer origin
     if (process.env.NODE_ENV === 'development') {
-      console.log('CORS: Development mode, allowing all origins');
       return callback(null, true);
     }
     
@@ -36,13 +53,9 @@ app.use(cors({
     const isVercel = origin.includes('.vercel.app');
     const isFrontendUrl = FRONTEND_URL && origin.startsWith(FRONTEND_URL);
     
-    console.log(`CORS: isLocalhost: ${isLocalhost}, isVercel: ${isVercel}, isFrontendUrl: ${isFrontendUrl}`);
-    
     if (isLocalhost || isVercel || isFrontendUrl) {
-      console.log('CORS: Origin allowed');
       callback(null, true);
     } else {
-      console.log('CORS: Origin NOT allowed');
       callback(new Error('Not allowed by CORS'));
     }
   },
@@ -50,7 +63,9 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   exposedHeaders: ['Content-Length', 'Content-Type'],
-  maxAge: 86400 // 24 horas
+  maxAge: 86400, // 24 horas
+  preflightContinue: false,
+  optionsSuccessStatus: 200
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -65,6 +80,18 @@ app.use('/api', routes);
 
 // Error handling middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  // Se for erro de CORS, retornar resposta apropriada
+  if (err.message === 'Not allowed by CORS') {
+    const origin = req.headers.origin;
+    if (origin) {
+      res.header('Access-Control-Allow-Origin', origin);
+    }
+    return res.status(403).json({
+      error: 'CORS policy violation',
+      message: 'Origin not allowed'
+    });
+  }
+  
   console.error('Error:', err);
   res.status(500).json({
     error: 'Internal server error',
