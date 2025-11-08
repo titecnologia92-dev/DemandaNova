@@ -4,16 +4,17 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
-// Criar cliente com valores padrão durante o build (serão substituídos em runtime)
-// Isso evita erros durante o build do Next.js
-const url = supabaseUrl || 'https://placeholder.supabase.co';
-const key = supabaseAnonKey || 'placeholder-key';
+// Criar cliente Supabase
+// Se as variáveis não estiverem disponíveis durante o build, usar uma URL válida do Supabase
+// O formato deve ser: https://[projeto-id].supabase.co
+const url = supabaseUrl || 'https://xxxxxxxxxxxxxxxxxxxxx.supabase.co';
+const key = supabaseAnonKey || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eCIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNjQ1MTkyMDAwLCJleHAiOjE5NjA3NjgwMDB9.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
 
 export const supabase = createClient(url, key, {
   auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true
+    autoRefreshToken: !!supabaseUrl && !!supabaseAnonKey,
+    persistSession: !!supabaseUrl && !!supabaseAnonKey,
+    detectSessionInUrl: !!supabaseUrl && !!supabaseAnonKey
   }
 });
 
