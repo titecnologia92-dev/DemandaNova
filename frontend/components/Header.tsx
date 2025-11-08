@@ -11,7 +11,7 @@ export default function Header() {
   const [user, setUser] = useState<any>(null);
 
   // Páginas que não devem mostrar o header global
-  const hideHeaderPaths = ['/login', '/registro', '/carrinho', '/checkout', '/pedido'];
+  const hideHeaderPaths = ['/login', '/registro', '/carrinho', '/checkout'];
   const shouldHideHeader = hideHeaderPaths.some(path => pathname?.startsWith(path));
 
   useEffect(() => {
@@ -44,6 +44,9 @@ export default function Header() {
             <>
               <Link href="/carrinho" className="text-gray-700 text-lg md:text-xl hover:text-gray-900 transition-colors">
                 🛒
+              </Link>
+              <Link href="/pedidos" className="text-sm md:text-base text-gray-600 hover:text-gray-800 transition-colors">
+                Meus Pedidos
               </Link>
               <button onClick={handleLogout} className="text-sm md:text-base text-gray-600 hover:text-gray-800 transition-colors">
                 Sair

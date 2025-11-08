@@ -18,9 +18,24 @@ class ApiClient {
     if (typeof window === 'undefined') return null;
     
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session }, error } = await supabase.auth.getSession();
+      
+      // Se houver erro de refresh token, limpar sessão
+      if (error) {
+        if (error.message.includes('refresh_token') || error.message.includes('Invalid Refresh Token')) {
+          await supabase.auth.signOut();
+          // Redirecionar para login se estiver no cliente
+          if (typeof window !== 'undefined') {
+            window.location.href = '/login';
+          }
+        }
+        return null;
+      }
+      
       return session?.access_token || null;
-    } catch {
+    } catch (error) {
+      // Em caso de erro, limpar sessão
+      await supabase.auth.signOut();
       return null;
     }
   }
@@ -69,6 +84,13 @@ class ApiClient {
       }
 
       if (!response.ok) {
+        // Se for erro 401 (não autorizado), limpar sessão e redirecionar
+        if (response.status === 401) {
+          await supabase.auth.signOut();
+          if (typeof window !== 'undefined') {
+            window.location.href = '/login';
+          }
+        }
         throw new Error(data.error || 'Erro na requisição');
       }
 

@@ -14,7 +14,10 @@ export const supabase = createClient(url, key, {
   auth: {
     autoRefreshToken: !!supabaseUrl && !!supabaseAnonKey,
     persistSession: !!supabaseUrl && !!supabaseAnonKey,
-    detectSessionInUrl: !!supabaseUrl && !!supabaseAnonKey
+    detectSessionInUrl: !!supabaseUrl && !!supabaseAnonKey,
+    // Configurações adicionais para melhor tratamento de tokens
+    storageKey: 'sb-auth-token',
+    flowType: 'pkce'
   }
 });
 

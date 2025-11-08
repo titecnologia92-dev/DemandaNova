@@ -31,6 +31,26 @@ function CheckoutContent() {
     });
   }, [router]);
 
+  // Função para formatar CEP (00000-000)
+  const formatCEP = (value: string): string => {
+    // Remove tudo que não é número
+    const numbers = value.replace(/\D/g, '');
+    
+    // Limita a 8 dígitos
+    const limited = numbers.slice(0, 8);
+    
+    // Aplica a máscara
+    if (limited.length <= 5) {
+      return limited;
+    }
+    return `${limited.slice(0, 5)}-${limited.slice(5)}`;
+  };
+
+  const handleCEPChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatCEP(e.target.value);
+    setEndereco({ ...endereco, cep: formatted });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!metodoPagamento) {
@@ -162,9 +182,10 @@ function CheckoutContent() {
                     <input
                       type="text"
                       value={endereco.cep}
-                      onChange={(e) => setEndereco({ ...endereco, cep: e.target.value })}
+                      onChange={handleCEPChange}
                       className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-300 focus:border-gray-300"
                       placeholder="00000-000"
+                      maxLength={9}
                       required
                     />
                   </div>
