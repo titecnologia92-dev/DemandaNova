@@ -51,9 +51,6 @@ export default function RegistroPage() {
       });
 
       if (error) {
-        console.error('Erro do Supabase:', error);
-        console.error('Código do erro:', error.status);
-        console.error('Mensagem:', error.message);
         throw error;
       }
 
@@ -69,8 +66,6 @@ export default function RegistroPage() {
         }
       }
     } catch (err: any) {
-      console.error('Erro completo:', err);
-      
       // Mensagens de erro mais amigáveis
       let errorMessage = 'Erro ao criar conta';
       

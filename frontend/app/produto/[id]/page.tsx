@@ -29,7 +29,6 @@ export default function ProdutoPage() {
           setAvaliacoes(avaliacoesData || []);
         } catch (avaliacoesError) {
           // Se não houver avaliações, apenas define como array vazio
-          console.log('Nenhuma avaliação encontrada para este produto');
           setAvaliacoes([]);
         }
       } catch (err) {

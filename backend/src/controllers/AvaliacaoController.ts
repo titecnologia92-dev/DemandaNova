@@ -23,11 +23,6 @@ export class AvaliacaoController {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('❌ Erro ao buscar avaliações:', error);
-        console.error('  Código:', error.code);
-        console.error('  Mensagem:', error.message);
-        console.error('  Detalhes:', error.details);
-        
         // Se não houver avaliações, retorna array vazio em vez de erro
         if (error.code === 'PGRST116' || error.message?.includes('No rows')) {
           return res.json([]);
@@ -36,8 +31,6 @@ export class AvaliacaoController {
         throw new AppError(`Erro ao buscar avaliações: ${error.message}`, 500);
       }
 
-      // Sempre retorna um array, mesmo que vazio
-      console.log(`✅ Avaliações encontradas para produto ${produtoId}: ${data?.length || 0}`);
       res.json(data || []);
     } catch (error) {
       handleError(error as Error, res);

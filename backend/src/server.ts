@@ -22,61 +22,6 @@ app.get('/health', (req: Request, res: Response) => {
   res.json({ status: 'ok', message: 'API is running' });
 });
 
-// Test Supabase connection
-app.get('/test-supabase', async (req: Request, res: Response) => {
-  try {
-    const supabaseUrl = process.env.SUPABASE_URL || '';
-    
-    // Teste 1: Verificar se a URL está acessível
-    try {
-      console.log('Testando conexão HTTP com:', supabaseUrl);
-      const httpTest = await fetch(`${supabaseUrl}/rest/v1/`, {
-        method: 'GET',
-        headers: {
-          'apikey': process.env.SUPABASE_SERVICE_ROLE_KEY || '',
-          'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY || ''}`
-        }
-      });
-      console.log('Status HTTP:', httpTest.status);
-    } catch (httpError: any) {
-      console.error('Erro ao testar HTTP:', httpError.message);
-      return res.status(500).json({
-        status: 'error',
-        message: 'Erro de conexão HTTP com Supabase',
-        error: httpError.message,
-        url: supabaseUrl
-      });
-    }
-    
-    // Teste 2: Usar cliente Supabase
-    const { supabase } = await import('./lib/supabase');
-    const { data, error } = await supabase.from('produtos').select('*').limit(1);
-    
-    if (error) {
-      return res.status(500).json({ 
-        status: 'error', 
-        message: 'Erro ao buscar dados do Supabase',
-        error: error.message,
-        details: error
-      });
-    }
-    
-    res.json({ 
-      status: 'ok', 
-      message: 'Conexão com Supabase OK',
-      produtosCount: data?.length || 0,
-      sample: data?.[0] || null
-    });
-  } catch (error: any) {
-    res.status(500).json({ 
-      status: 'error', 
-      message: 'Erro ao testar Supabase',
-      error: error.message,
-      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
-    });
-  }
-});
-
 // Routes
 app.use('/api', routes);
 

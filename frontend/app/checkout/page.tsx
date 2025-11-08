@@ -224,6 +224,7 @@ function CheckoutContent() {
               </div>
             </div>
           </aside>
+          </div>
         </div>
       </div>
     </div>

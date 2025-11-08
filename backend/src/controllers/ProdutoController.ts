@@ -26,16 +26,9 @@ export class ProdutoController {
       const { data, error } = await query;
 
       if (error) {
-        console.error('❌ Erro ao buscar produtos do Supabase:');
-        console.error('  Código:', error.code);
-        console.error('  Mensagem:', error.message);
-        console.error('  Detalhes:', error.details);
-        console.error('  Hint:', error.hint);
-        console.error('  Erro completo:', JSON.stringify(error, null, 2));
         throw new AppError(`Erro ao buscar produtos: ${error.message || 'Erro desconhecido'}`, 500);
       }
 
-      console.log(`✅ Produtos encontrados: ${data?.length || 0}`);
       res.json(data || []);
     } catch (error) {
       console.error('Erro no controller de produtos:', error);
