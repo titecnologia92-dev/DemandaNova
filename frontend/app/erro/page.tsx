@@ -1,9 +1,10 @@
 'use client';
 
 import { useSearchParams, useRouter } from 'next/navigation';
+import { Suspense } from 'react';
 import Link from 'next/link';
 
-export default function ErroPage() {
+function ErroContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const tipo = searchParams.get('tipo') || 'geral';
@@ -63,6 +64,23 @@ export default function ErroPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ErroPage() {
+  return (
+    <Suspense fallback={
+      <div className="w-full bg-gray-50 p-4 md:p-6 lg:p-8 min-h-screen flex items-center justify-center">
+        <div className="max-w-md w-full mx-auto bg-white rounded-xl shadow-md p-6 md:p-8">
+          <div className="text-center">
+            <div className="text-4xl text-gray-400 mb-4">⚠️</div>
+            <h2 className="text-lg md:text-xl lg:text-2xl text-gray-800 font-semibold">Carregando...</h2>
+          </div>
+        </div>
+      </div>
+    }>
+      <ErroContent />
+    </Suspense>
   );
 }
 
