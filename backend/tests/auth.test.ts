@@ -11,5 +11,7 @@ describe('Auth Controller', () => {
     const password = 'senha123';
     expect(password.length).toBeGreaterThanOrEqual(6);
   });
-});
+}); 
+
+
 
